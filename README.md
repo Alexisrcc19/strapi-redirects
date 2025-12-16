@@ -102,3 +102,18 @@ Feel free to reach out or submit pull requests on GitHub if you're interested in
 ## License
 
 This plugin is available under the MIT License. For more information, please refer to the LICENSE file in the repository.
+
+## FORK DESCRIPTION: Publish via AWS CodeBuild
+
+The admin exposes two buttons to trigger CodeBuild:
+- Publish redirects (stg) → runs the staging project.
+- Publish redirects (prod) → runs the production project.
+
+Required environment variables (set them in your Strapi runtime):
+- AWS_REGION
+- CODEBUILD_PROJECT_STG (staging project name)
+- CODEBUILD_PROJECT_PROD (production project name)
+- Optional: CODEBUILD_SOURCE_VERSION (branch/commit ref); fallback: REDIRECTS_GITHUB_BRANCH → main
+- Credentials: via AWS IAM role in the runtime, or AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+
+Endpoint used: POST /redirects/publish with body `{ stage: "stg" | "prod" }`.

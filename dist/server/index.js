@@ -12,6 +12,7 @@ const require$$0$6 = require("stream");
 const require$$2$1 = require("util");
 const require$$0$8 = require("constants");
 require("node:stream");
+const clientCodebuild = require("@aws-sdk/client-codebuild");
 const _interopDefault = (e) => e && e.__esModule ? e : { default: e };
 const require$$1__default = /* @__PURE__ */ _interopDefault(require$$1);
 const require$$0__default = /* @__PURE__ */ _interopDefault(require$$0$1);
@@ -266,6 +267,18 @@ const redirectsController = ({ strapi: strapi2 }) => ({
     } catch (error2) {
       this.handleError(ctx, error2, "Failed to import redirects.");
     }
+  },
+  /**
+   * Trigger publish webhook
+   */
+  async publish(ctx) {
+    try {
+      const stage = ctx.request.body?.stage;
+      await strapi2.plugin("redirects").service("redirectService").publish(stage);
+      ctx.body = { status: "success" };
+    } catch (error2) {
+      this.handleError(ctx, error2, "Failed to trigger publish.");
+    }
   }
 });
 const controllers = {
@@ -356,6 +369,15 @@ const admin = [
       policies: [],
       auth: false
     }
+  },
+  {
+    method: "POST",
+    path: "/publish",
+    handler: "redirectsController.publish",
+    config: {
+      policies: [],
+      auth: false
+    }
   }
 ];
 const contentApi = [
@@ -427,8 +449,12 @@ const settingsService = ({ strapi: strapi2 }) => {
   return {
     async getSettings() {
       try {
-        const settings = await pluginStore.get({ key: STORE_KEY });
-        return Array.isArray(settings) ? settings : Object.entries(settings || {}).map(([uid, value]) => ({ uid, ...value }));
+        const rawSettings = await pluginStore.get({ key: STORE_KEY }) ?? [];
+        if (Array.isArray(rawSettings)) return rawSettings;
+        return Object.entries(rawSettings).map(([uid, value]) => ({
+          uid,
+          ...value && typeof value === "object" ? value : {}
+        }));
       } catch (error2) {
         strapi2.log.error("Error fetching settings:", error2);
         return [];
@@ -455,11 +481,12 @@ const settingsService = ({ strapi: strapi2 }) => {
       const result = [];
       Object.entries(strapi2.contentTypes).forEach(([uid, contentType]) => {
         if (!uid.startsWith("api::")) return;
-        const fields2 = Object.entries(contentType.attributes).filter(([_2, attr]) => FIELD_TYPES.includes(attr.type)).map(([name]) => ({ name }));
+        const attributes = contentType?.attributes ?? {};
+        const fields2 = Object.entries(attributes).filter(([_2, attr]) => FIELD_TYPES.includes(attr.type)).map(([name]) => ({ name }));
         if (fields2.length > 0) {
           result.push({
             uid,
-            info: contentType.info,
+            info: contentType?.info ?? {},
             fields: fields2
           });
         }
@@ -28790,6 +28817,7 @@ const { ApplicationError: ApplicationError2 } = errors;
 const redirectService = strapi$1.factories.createCoreService(
   "plugin::redirects.redirect",
   ({ strapi: strapi2 }) => ({
+    codebuildClient: new clientCodebuild.CodeBuildClient({ region: process.env.AWS_REGION }),
     format(urlTemplate, fieldValue, locale2 = "") {
       return urlTemplate.replace("[field]", fieldValue).replace("[locale]", locale2);
     },
@@ -28949,6 +28977,34 @@ const redirectService = strapi$1.factories.createCoreService(
         }
       }
       return importResults;
+    },
+    /**
+     * Trigger publish via AWS CodeBuild
+     *
+     * @param stage
+     */
+    async publish(stage) {
+      const targetStage = stage ?? "stg";
+      const projectName = targetStage === "prod" ? process.env.CODEBUILD_PROJECT_PROD : process.env.CODEBUILD_PROJECT_STG;
+      const branch = process.env.CODEBUILD_SOURCE_VERSION ?? process.env.REDIRECTS_GITHUB_BRANCH ?? "main";
+      const startBuild = new clientCodebuild.StartBuildCommand({
+        projectName,
+        sourceVersion: branch,
+        environmentVariablesOverride: [
+          {
+            name: "STAGE",
+            value: targetStage,
+            type: "PLAINTEXT"
+          }
+        ]
+      });
+      const response = await this.codebuildClient.send(startBuild);
+      if (response.build?.id) {
+        strapi2.log.info(
+          `CodeBuild triggered for ${projectName} (stage: ${targetStage}) buildId=${response.build.id}`
+        );
+      }
+      return { status: "success" };
     }
   })
 );

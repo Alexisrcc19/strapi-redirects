@@ -4,7 +4,7 @@ const jsxRuntime = require("react/jsx-runtime");
 const admin = require("@strapi/strapi/admin");
 const reactRouterDom = require("react-router-dom");
 const reactIntl = require("react-intl");
-const index = require("./index-1r723z2F.js");
+const index = require("./index-CM2X5Pet.js");
 const React = require("react");
 const useDebounce = require("use-debounce");
 require("react-dom/client");
@@ -581,7 +581,7 @@ const Pagination = ({ activePage, pageCount, handlePageChange }) => {
 const HomePage = () => {
   const { formatMessage } = reactIntl.useIntl();
   const { toggleNotification } = useNotification();
-  const { get, del } = index.useFetchClient();
+  const { get, del, post } = index.useFetchClient();
   const pageSizes = [5, 10, 20, 50];
   const headers = redirectTableHeaders(formatMessage);
   const { pageSize, page, setNewPage, setNewPageSize } = useSearchQuery();
@@ -599,6 +599,7 @@ const HomePage = () => {
     pageCount: 1,
     total: 0
   });
+  const [publishingStage, setPublishingStage] = React.useState(null);
   const [isRedirectModalOpen, setIsRedirectModalOpen] = React.useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
   const [selectedRedirects, setSelectedRedirects] = React.useState([]);
@@ -669,6 +670,34 @@ const HomePage = () => {
       });
     }
   };
+  const handlePublishRedirects = async (stage) => {
+    setPublishingStage(stage);
+    try {
+      await post(`/${index.PLUGIN_ID}/publish`, { stage });
+      toggleNotification({
+        type: "success",
+        message: formatMessage({
+          id: index.getTranslation(
+            stage === "prod" ? "pages.homePage.header.button.publishProd.success" : "pages.homePage.header.button.publishStg.success"
+          ),
+          defaultMessage: stage === "prod" ? "Production publish started" : "Staging publish started"
+        })
+      });
+    } catch (error) {
+      console.error("Error publishing redirects", error);
+      toggleNotification({
+        type: "warning",
+        message: formatMessage({
+          id: index.getTranslation(
+            stage === "prod" ? "pages.homePage.header.button.publishProd.error" : "pages.homePage.header.button.publishStg.error"
+          ),
+          defaultMessage: "Failed to trigger publish"
+        })
+      });
+    } finally {
+      setPublishingStage(null);
+    }
+  };
   const getRedirects = async () => {
     try {
       setIsFetching(true);
@@ -715,7 +744,35 @@ const HomePage = () => {
           /* @__PURE__ */ jsxRuntime.jsx(designSystem.Button, { variant: "primary", startIcon: /* @__PURE__ */ jsxRuntime.jsx(icons.Plus, {}), onClick: handleRedirectModal, children: formatMessage({
             id: index.getTranslation("pages.homePage.header.button.redirect"),
             defaultMessage: "Add a Redirect"
-          }) })
+          }) }),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            designSystem.Button,
+            {
+              variant: "primary",
+              startIcon: /* @__PURE__ */ jsxRuntime.jsx(icons.CloudUpload, {}),
+              loading: publishingStage === "stg",
+              disabled: publishingStage !== null,
+              onClick: () => handlePublishRedirects("stg"),
+              children: formatMessage({
+                id: index.getTranslation("pages.homePage.header.button.publishStg"),
+                defaultMessage: "Publish redirects (stg)"
+              })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            designSystem.Button,
+            {
+              variant: "primary",
+              startIcon: /* @__PURE__ */ jsxRuntime.jsx(icons.CloudUpload, {}),
+              loading: publishingStage === "prod",
+              disabled: publishingStage !== null,
+              onClick: () => handlePublishRedirects("prod"),
+              children: formatMessage({
+                id: index.getTranslation("pages.homePage.header.button.publishProd"),
+                defaultMessage: "Publish redirects (prod)"
+              })
+            }
+          )
         ] }),
         title: formatMessage({
           id: index.getTranslation("plugin.name"),

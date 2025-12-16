@@ -25528,7 +25528,7 @@ const index = {
         defaultMessage: "Redirects"
       },
       Component: async () => {
-        const { App } = await Promise.resolve().then(() => require("./App-qwqkq24z.js"));
+        const { App } = await Promise.resolve().then(() => require("./App-g2NEqnqP.js"));
         return App;
       }
     });
@@ -25553,7 +25553,7 @@ const index = {
           id: "redirects-settings",
           to: `/settings/${PLUGIN_ID}`,
           Component: async () => {
-            const { Settings } = await Promise.resolve().then(() => require("./Settings-D2Bij_TB.js"));
+            const { Settings } = await Promise.resolve().then(() => require("./Settings-DwCPZeVw.js"));
             return Settings;
           }
         }
@@ -25570,7 +25570,7 @@ const index = {
     const { locales } = app;
     const importedTranslations = await Promise.all(
       locales.map((locale) => {
-        return __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => Promise.resolve().then(() => require("./en-D7beLT2z.js")) }), `./translations/${locale}.json`, 3).then(({ default: data }) => {
+        return __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => Promise.resolve().then(() => require("./en-DGXgGqrw.js")) }), `./translations/${locale}.json`, 3).then(({ default: data }) => {
           return {
             data: prefixPluginTranslations(data),
             locale

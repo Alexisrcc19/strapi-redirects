@@ -80,4 +80,13 @@ export default [
       auth: false,
     },
   },
+  {
+    method: 'POST',
+    path: '/publish',
+    handler: 'redirectsController.publish',
+    config: {
+      policies: [],
+      auth: false,
+    },
+  },
 ];

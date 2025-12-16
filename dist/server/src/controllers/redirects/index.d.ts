@@ -30,5 +30,9 @@ declare const _default: ({ strapi }: {
      * Import redirects
      */
     import(ctx: any): Promise<any>;
+    /**
+     * Trigger publish webhook
+     */
+    publish(ctx: any): Promise<void>;
 };
 export default _default;

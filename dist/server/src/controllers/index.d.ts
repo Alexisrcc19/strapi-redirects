@@ -21,6 +21,7 @@ declare const _default: {
         update(ctx: any): Promise<any>;
         delete(ctx: any): Promise<any>;
         import(ctx: any): Promise<any>;
+        publish(ctx: any): Promise<void>;
     };
 };
 export default _default;

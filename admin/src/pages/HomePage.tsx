@@ -24,7 +24,7 @@ import {
   SingleSelect,
   SingleSelectOption,
 } from '@strapi/design-system';
-import { Pencil, Plus, Trash, ChevronUp, ChevronDown, Upload } from '@strapi/icons';
+import { Pencil, Plus, Trash, ChevronUp, ChevronDown, Upload, CloudUpload } from '@strapi/icons';
 
 import { PLUGIN_ID } from '../pluginId';
 import { RedirectType, PaginationType } from '../../../types/redirectPluginTypes';
@@ -41,7 +41,7 @@ import { Pagination } from '../components/Pagination';
 const HomePage = () => {
   const { formatMessage } = useIntl();
   const { toggleNotification } = useNotification();
-  const { get, del } = useFetchClient();
+  const { get, del, post } = useFetchClient();
 
   const pageSizes = [5, 10, 20, 50];
   const headers = redirectTableHeaders(formatMessage);
@@ -61,6 +61,7 @@ const HomePage = () => {
     pageCount: 1,
     total: 0,
   });
+  const [publishingStage, setPublishingStage] = useState<'stg' | 'prod' | null>(null);
 
   // Modal state management
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false);
@@ -147,6 +148,39 @@ const HomePage = () => {
     }
   };
 
+  const handlePublishRedirects = async (stage: 'stg' | 'prod') => {
+    setPublishingStage(stage);
+    try {
+      await post(`/${PLUGIN_ID}/publish`, { stage });
+      toggleNotification({
+        type: 'success',
+        message: formatMessage({
+          id: getTranslation(
+            stage === 'prod'
+              ? 'pages.homePage.header.button.publishProd.success'
+              : 'pages.homePage.header.button.publishStg.success'
+          ),
+          defaultMessage: stage === 'prod' ? 'Production publish started' : 'Staging publish started',
+        }),
+      });
+    } catch (error) {
+      console.error('Error publishing redirects', error);
+      toggleNotification({
+        type: 'warning',
+        message: formatMessage({
+          id: getTranslation(
+            stage === 'prod'
+              ? 'pages.homePage.header.button.publishProd.error'
+              : 'pages.homePage.header.button.publishStg.error'
+          ),
+          defaultMessage: 'Failed to trigger publish',
+        }),
+      });
+    } finally {
+      setPublishingStage(null);
+    }
+  };
+
   const getRedirects = async () => {
     try {
       setIsFetching(true);
@@ -204,6 +238,32 @@ const HomePage = () => {
               {formatMessage({
                 id: getTranslation('pages.homePage.header.button.redirect'),
                 defaultMessage: 'Add a Redirect',
+              })}
+            </Button>
+
+            <Button
+              variant="primary"
+              startIcon={<CloudUpload />}
+              loading={publishingStage === 'stg'}
+              disabled={publishingStage !== null}
+              onClick={() => handlePublishRedirects('stg')}
+            >
+              {formatMessage({
+                id: getTranslation('pages.homePage.header.button.publishStg'),
+                defaultMessage: 'Publish redirects (stg)',
+              })}
+            </Button>
+
+            <Button
+              variant="primary"
+              startIcon={<CloudUpload />}
+              loading={publishingStage === 'prod'}
+              disabled={publishingStage !== null}
+              onClick={() => handlePublishRedirects('prod')}
+            >
+              {formatMessage({
+                id: getTranslation('pages.homePage.header.button.publishProd'),
+                defaultMessage: 'Publish redirects (prod)',
               })}
             </Button>
           </Flex>

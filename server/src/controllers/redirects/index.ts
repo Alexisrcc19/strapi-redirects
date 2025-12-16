@@ -121,4 +121,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       this.handleError(ctx, error, 'Failed to import redirects.');
     }
   },
+
+  /**
+   * Trigger publish webhook
+   */
+  async publish(ctx) {
+    try {
+      const stage = ctx.request.body?.stage;
+      await strapi.plugin('redirects').service('redirectService').publish(stage);
+      ctx.body = { status: 'success' };
+    } catch (error) {
+      this.handleError(ctx, error, 'Failed to trigger publish.');
+    }
+  },
 });

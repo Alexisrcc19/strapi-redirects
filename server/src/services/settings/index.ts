@@ -11,11 +11,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
   return {
     async getSettings() {
       try {
-        const settings = await pluginStore.get({ key: STORE_KEY });
-        // Ensure settings is an array
-        return Array.isArray(settings)
-          ? settings
-          : Object.entries(settings || {}).map(([uid, value]) => ({ uid, ...value }));
+        const rawSettings = (await pluginStore.get({ key: STORE_KEY })) ?? [];
+
+        if (Array.isArray(rawSettings)) return rawSettings;
+
+        return Object.entries(rawSettings as Record<string, unknown>).map(([uid, value]) => ({
+          uid,
+          ...(value && typeof value === 'object' ? value : {}),
+        }));
       } catch (error) {
         strapi.log.error('Error fetching settings:', error);
         return [];
@@ -51,14 +54,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
       Object.entries(strapi.contentTypes).forEach(([uid, contentType]) => {
         if (!uid.startsWith('api::')) return;
 
-        const fields = Object.entries(contentType.attributes)
+        const attributes = (contentType as any)?.attributes ?? {};
+        const fields = Object.entries(attributes)
           .filter(([_, attr]: [string, any]) => FIELD_TYPES.includes(attr.type))
           .map(([name]) => ({ name }));
 
         if (fields.length > 0) {
           result.push({
             uid,
-            info: contentType.info,
+            info: (contentType as any)?.info ?? {},
             fields,
           });
         }
