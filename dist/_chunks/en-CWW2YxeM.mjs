@@ -1,0 +1,42 @@
+const loading = "Loading...";
+const en = {
+  loading,
+  "plugin.name": "Redirects",
+  "overview.table.headers.source": "Source",
+  "overview.table.headers.destination": "Destination",
+  "overview.table.headers.permanent": "Permanent",
+  "overview.table.headers.actions": "Actions",
+  "overview.table.headers.status": "Status",
+  "overview.table.body.empty.content": "You don't have any redirects yet...",
+  "overview.table.body.empty.button": "Create your first Redirect",
+  "pages.homePage.header.button.import": "Import Redirects",
+  "pages.homePage.header.button.redirect": "Add a Redirect",
+  "pages.homePage.header.subtitle": "{number, plural, =0 {# entries} one {# entry} other {# entries}} found",
+  "pages.homePage.bulkDelete": "Delete Selected",
+  "pages.homePage.table.edit": "Edit",
+  "pages.homePage.table.delete": "Delete",
+  "pages.homePage.search.clearLabel": "Clear redirects",
+  "pages.homePage.search.placeholder": "Search redirects...",
+  "pages.homePage.search.ariaLabel": "Searching redirects",
+  "pages.homePage.entries.title": "Entries per page",
+  "modal.redirect.title.create": "Add a Redirect",
+  "modal.redirect.title.edit": "Edit a Redirect",
+  "modal.redirect.field.source": "Source",
+  "modal.redirect.field.destination": "Destination",
+  "modal.redirect.field.permanent": "Permanent",
+  "modal.redirect.confirm": "Save",
+  "modal.cancel": "Cancel",
+  "modal.import.title": "Import Redirects",
+  "modal.import.confirm": "Import Redirects",
+  "modal.import.dragAndDrop": "Drag and drop your CSV file here, or click to upload",
+  "form.notification.updated": "Redirect updated successfully!",
+  "form.notification.created": "Redirect created successfully!",
+  "import.title": "Import Redirects",
+  "components.pagination.go-to": "Go to page {page}",
+  "components.pagination.go-to-previous": "Go to previous page",
+  "components.pagination.go-to-next": "Go to next page"
+};
+export {
+  en as default,
+  loading
+};
