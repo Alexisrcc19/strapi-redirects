@@ -128,6 +128,8 @@ const RedirectModal = ({
           onSubmit={handleSubmit}
           validationSchema={validationSchema}
           initialValues={{ source, destination, permanent }}
+          width="100%"
+          height="100%"
         >
           <Modal.Body>
             <Grid.Root gap={4} gridCols={12}>

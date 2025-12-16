@@ -9,9 +9,14 @@ import { RedirectModal } from './RedirectModal';
 import { PLUGIN_ID } from '../pluginId';
 
 const RedirectAlert: React.FC = () => {
-  const { form, model } = useContentManagerContext();
-  const { initialValues, values } = form;
-
+  const { form, model } = useContentManagerContext() as {
+    form: {
+        initialValues?: Record<string, any>;
+        values?: Record<string, any>;
+    };
+    model: string;
+};
+const { initialValues, values } = form;
   const { get } = useFetchClient();
 
   const [settings, setSettings] = useState<LifecycleSetting[]>([]);
@@ -42,9 +47,9 @@ const RedirectAlert: React.FC = () => {
 
       if (trackedField && initialValues?.[trackedField] !== values?.[trackedField]) {
         setRedirectData({
-          source: `/${initialValues[trackedField]}` || '',
-          destination: `/${values[trackedField]}` || '',
-          permanent: true, // Default value
+            source: `/${(initialValues as any)?.[trackedField]}` || '',
+            destination: `/${(values as any)?.[trackedField]}` || '',
+            permanent: true,
         });
       } else {
         setRedirectData(null);
