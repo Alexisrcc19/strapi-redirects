@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import "react-dom/client";
 import { Main, Box, Typography, Table, Thead, Tr, Th, Tbody, Td, Checkbox, SingleSelect, SingleSelectOption } from "@strapi/design-system";
 import "@strapi/icons";
-import { u as useFetchClient, L as Layouts, P as PLUGIN_ID } from "./index-DlLBvc9Y.mjs";
+import { u as useFetchClient, L as Layouts, P as PLUGIN_ID } from "./index-BQtBXN4e.mjs";
 import "react-router-dom";
 import "@strapi/icons/symbols";
 import "styled-components";

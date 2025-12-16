@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const loading = "Loading...";
 const en = {
   loading,
@@ -11,6 +13,12 @@ const en = {
   "overview.table.body.empty.button": "Create your first Redirect",
   "pages.homePage.header.button.import": "Import Redirects",
   "pages.homePage.header.button.redirect": "Add a Redirect",
+  "pages.homePage.header.button.publishStg": "Publish redirects (stg)",
+  "pages.homePage.header.button.publishProd": "Publish redirects (prod)",
+  "pages.homePage.header.button.publishStg.success": "Staging publish started",
+  "pages.homePage.header.button.publishProd.success": "Production publish started",
+  "pages.homePage.header.button.publishStg.error": "Failed to start staging publish",
+  "pages.homePage.header.button.publishProd.error": "Failed to start production publish",
   "pages.homePage.header.subtitle": "{number, plural, =0 {# entries} one {# entry} other {# entries}} found",
   "pages.homePage.bulkDelete": "Delete Selected",
   "pages.homePage.table.edit": "Edit",
@@ -36,7 +44,5 @@ const en = {
   "components.pagination.go-to-previous": "Go to previous page",
   "components.pagination.go-to-next": "Go to next page"
 };
-export {
-  en as default,
-  loading
-};
+exports.default = en;
+exports.loading = loading;

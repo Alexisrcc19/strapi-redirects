@@ -1,6 +1,7 @@
 import { errors } from '@strapi/utils';
 import { factories } from '@strapi/strapi';
 import type { Core } from '@strapi/types';
+import { CodeBuildClient, StartBuildCommand } from '@aws-sdk/client-codebuild';
 
 const { ApplicationError } = errors;
 
@@ -15,6 +16,7 @@ import {
 export default factories.createCoreService(
   'plugin::redirects.redirect',
   ({ strapi }: { strapi: Core.Strapi }) => ({
+    codebuildClient: new CodeBuildClient({ region: process.env.AWS_REGION }),
     format(urlTemplate: string, fieldValue: string, locale = '') {
       return urlTemplate.replace('[field]', fieldValue).replace('[locale]', locale);
     },
@@ -212,6 +214,45 @@ export default factories.createCoreService(
       }
 
       return importResults;
+    },
+
+    /**
+     * Trigger publish via AWS CodeBuild
+     *
+     * @param stage
+     */
+    async publish(stage?: string) {
+      const targetStage = stage ?? 'stg';
+
+      const projectName =
+        targetStage === 'prod'
+          ? process.env.CODEBUILD_PROJECT_PROD
+          : process.env.CODEBUILD_PROJECT_STG;
+
+      const branch =
+        process.env.CODEBUILD_SOURCE_VERSION ?? process.env.REDIRECTS_GITHUB_BRANCH ?? 'main';
+
+      const startBuild = new StartBuildCommand({
+        projectName,
+        sourceVersion: branch,
+        environmentVariablesOverride: [
+          {
+            name: 'STAGE',
+            value: targetStage,
+            type: 'PLAINTEXT',
+          },
+        ],
+      });
+
+      const response = await this.codebuildClient.send(startBuild);
+
+      if (response.build?.id) {
+        strapi.log.info(
+          `CodeBuild triggered for ${projectName} (stage: ${targetStage}) buildId=${response.build.id}`
+        );
+      }
+
+      return { status: 'success' };
     },
   })
 );

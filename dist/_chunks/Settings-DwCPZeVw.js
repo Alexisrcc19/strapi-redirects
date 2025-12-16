@@ -6,7 +6,7 @@ const reactIntl = require("react-intl");
 require("react-dom/client");
 const designSystem = require("@strapi/design-system");
 require("@strapi/icons");
-const index = require("./index-1r723z2F.js");
+const index = require("./index-CM2X5Pet.js");
 require("react-router-dom");
 require("@strapi/icons/symbols");
 require("styled-components");

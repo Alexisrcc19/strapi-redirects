@@ -35,6 +35,7 @@ declare const _default: {
             update(ctx: any): Promise<any>;
             delete(ctx: any): Promise<any>;
             import(ctx: any): Promise<any>;
+            publish(ctx: any): Promise<void>;
         };
     };
     routes: {
@@ -78,6 +79,7 @@ declare const _default: {
         redirectService: ({ strapi, }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
+            codebuildClient: import("@aws-sdk/client-codebuild").CodeBuildClient;
             format: (urlTemplate: string, fieldValue: string, locale?: string) => string;
             findOne: (id: string) => Promise<import("@strapi/types/dist/modules/documents").AnyDocument>;
             findAll: (params?: import("../../types/redirectPluginTypes").FindAllParams) => Promise<import("../../types/redirectPluginTypes").FindAllResponse>;
@@ -90,6 +92,9 @@ declare const _default: {
             import: (data: (import("../../types/redirectPluginTypes").RedirectInput & Partial<{
                 status: string;
             }>)[]) => Promise<import("../../types/redirectPluginTypes").ImportResult[]>;
+            publish: (stage?: string) => Promise<{
+                status: string;
+            }>;
         } & import("@strapi/types/dist/core/core-api/service").Base;
     };
     contentTypes: {
